@@ -1,12 +1,12 @@
+import app from "./app";
+import config from "./config";
+import { initDB } from "./db";
 
-import express from "express";
+const main = async () => {
+    initDB();
+    app.listen(config.port, () => {
+        console.log(`Server is running on port ${config.port}`);
+    })
+}
 
-const app: express.Application = express();
-
-app.get("/", (req: express.Request, res: express.Response) => {
-    res.send("Hello, World!")
-})
-
-app.listen(3000, () => {
-    console.log("Server is running on http://localhost:3000")
-})
+main();
