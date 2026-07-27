@@ -1,8 +1,6 @@
 
 import type { TSendResponse } from "../types";
 
-const sendResponse: TSendResponse = (res, statusCode, payload) => {
+export const sendResponse: TSendResponse = (res, payload, statusCode) => {
     return res.status(statusCode).json(payload);
 }
-
-export default sendResponse;
