@@ -1,17 +1,17 @@
 import { Router } from 'express';
-import { signup } from '../controllers/auth.controller';
+import { login, signup } from '../controllers/auth.controller';
 
 const router = Router();
 
 router.post("/signup", signup)
-router.post("/login", () => { })
+router.post("/login", login)
 
-router.post("api/issues", () => { })
+router.post("/issues", () => { })
 
 // router.get("api/issues?sort=newest", () => { })
-router.get("api/issues/:id", () => { })
+router.get("/issues/:id", () => { })
 
-router.put("api/issues/:id", () => { })
-router.delete("Sapi/issues/:id", () => { })
+router.put("/issues/:id", () => { })
+router.delete("/issues/:id", () => { })
 
 export default router;

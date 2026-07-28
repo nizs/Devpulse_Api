@@ -38,6 +38,8 @@ export type TUser = {
 
 export type RUser = Omit<TUser, "id" | "h_password" | "created_at" | "updated_at">
 
+export type SafeUser = Omit<TUser, "h_password">;
+
 
 export type IssueType = "bug" | "feature_request";
 export type IssueStatus = "open" | "in_progress" | "resolved";
@@ -53,3 +55,4 @@ export type TIssue = {
     created_at: Date;
     updated_at: Date;
 }
+
