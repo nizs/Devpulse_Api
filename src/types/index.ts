@@ -1,3 +1,4 @@
+
 import type { ErrorRequestHandler, Response } from "express";
 
 export type TResponse<T> = {
@@ -30,7 +31,6 @@ export type TUser = {
     name: string;
     email: string;
     h_password: string;
-    age: number;
     role: Role;
     created_at: Date;
     updated_at: Date;
@@ -39,6 +39,12 @@ export type TUser = {
 export type RUser = Omit<TUser, "id" | "h_password" | "created_at" | "updated_at">
 
 export type SafeUser = Omit<TUser, "h_password">;
+
+export type TokenPayload = {
+    id: number;
+    name: string;
+    role: Role;
+};
 
 
 export type IssueType = "bug" | "feature_request";

@@ -1,8 +1,10 @@
+
 import type { Request, Response } from "express";
 import authService from "../services/auth.service";
 import { sendResponse } from "../../utils/sendResponse";
 import { HTTP_STATUS } from "../../utils/httpStatus";
-import { signToken } from "../../utils/jwt";
+import { signToken, verifyToken } from "../../utils/jwt";
+import type { TokenPayload } from "../../types";
 
 export const signup = async (req: Request, res: Response) => {
     const user = await authService.createUser(req.body)
@@ -24,15 +26,53 @@ export const login = async (req: Request, res: Response) => {
         return;
     }
 
-    const { accesstoken, refreshtoken } = signToken(user);
+    const tokenPayload: TokenPayload = {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+    };
+
+    const { accesstoken, refreshtoken } = signToken(tokenPayload);
+
+    res.cookie("refreshToken", refreshtoken, {
+        sameSite: "lax",
+        httpOnly: true,
+        secure: false
+    })
 
     const result = {
-        user: user,
         accesstoken,
         refreshtoken
     }
 
     return sendResponse(res, { success: true, message: "User login Successfull", data: result }, HTTP_STATUS.OK)
+}
 
+export const refresh = async (req: Request, res: Response) => {
+    const refreshToken = req.cookies?.refreshToken;
 
+    if (!refreshToken) {
+        return sendResponse(res, { success: false, message: "Refresh Token not found" }, HTTP_STATUS.UNAUTHORIZED)
+    }
+
+    const payload = verifyToken(refreshToken, "refresh");
+    if (!payload) {
+        return sendResponse(res, { success: false, message: "Invalid Refresh Token" }, HTTP_STATUS.UNAUTHORIZED)
+    }
+    console.log(payload)
+
+    const user = await authService.getUserById(payload.id.toString())
+    if (!user) {
+        return sendResponse(res, { success: false, message: "User not found " }, HTTP_STATUS.UNAUTHORIZED)
+    }
+
+    const { accesstoken, refreshtoken } = signToken(user);
+    sendResponse(res, {
+        success: true,
+        message: "Token Refreshed",
+        data: {
+            accesstoken,
+            refreshtoken
+        },
+    }, HTTP_STATUS.OK)
 }

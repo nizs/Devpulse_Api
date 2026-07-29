@@ -4,10 +4,12 @@ import logger from "./middleware/logger";
 import globalErrorHandler from "./middleware/globalErrorHandler";
 import authRoutes from "./api/routes/auth.route";
 import { notFound } from "./middleware/notFound";
+import cookieParser from "cookie-parser"
 
 const app: express.Application = express();
 
 app.use(logger);
+app.use(cookieParser());
 app.use(express.json());
 
 app.get("/", (req: express.Request, res: express.Response) => {
