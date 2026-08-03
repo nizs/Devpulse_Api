@@ -19,3 +19,25 @@ export const createIssue = async (req: Request, res: Response) => {
         HTTP_STATUS.CREATED
     )
 }
+
+export const getAllIssues = async (req: Request, res: Response
+) => {
+
+    const { sort, type, status } = req.query;
+
+    const issues = await issueService.getAllIssues({
+        sort: sort as "newest" | "oldest",
+        type: type as "bug" | "feature_request",
+        status: status as "open" | "in_progress" | "resolved",
+    });
+
+    return sendResponse(
+        res,
+        {
+            success: true,
+            message: "Issues retrieved successfully",
+            data: issues,
+        },
+        HTTP_STATUS.OK
+    );
+};

@@ -76,3 +76,19 @@ declare global {
         }
     }
 }
+
+export type GetIssueQuery = {
+    sort?: "newest" | "oldest";
+    type?: IssueType;
+    status?: IssueStatus;
+}
+
+export type Reporter = {
+    id: number;
+    name: string;
+    role: Role;
+}
+
+export type IssueResponse = Omit<TIssue, "reporter_id"> & {
+    reporter: Reporter;
+}
