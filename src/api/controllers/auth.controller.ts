@@ -17,6 +17,8 @@ export const signup = async (req: Request, res: Response) => {
 
 }
 
+
+
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const user = await authService.validateUser(email, password);
@@ -41,12 +43,14 @@ export const login = async (req: Request, res: Response) => {
     })
 
     const result = {
-        accesstoken,
-        refreshtoken
+        Token: accesstoken,
+        user
     }
 
     return sendResponse(res, { success: true, message: "User login Successfull", data: result }, HTTP_STATUS.OK)
 }
+
+
 
 export const refresh = async (req: Request, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
@@ -59,20 +63,26 @@ export const refresh = async (req: Request, res: Response) => {
     if (!payload) {
         return sendResponse(res, { success: false, message: "Invalid Refresh Token" }, HTTP_STATUS.UNAUTHORIZED)
     }
-    console.log(payload)
+    console.log(payload);
 
     const user = await authService.getUserById(payload.id.toString())
     if (!user) {
         return sendResponse(res, { success: false, message: "User not found " }, HTTP_STATUS.UNAUTHORIZED)
     }
 
-    const { accesstoken, refreshtoken } = signToken(user);
+    const tokenPayload: TokenPayload = {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+    };
+
+    const { accesstoken, refreshtoken: newRefreshToken } = signToken(tokenPayload);
     sendResponse(res, {
         success: true,
         message: "Token Refreshed",
         data: {
             accesstoken,
-            refreshtoken
+            newRefreshToken
         },
     }, HTTP_STATUS.OK)
 }

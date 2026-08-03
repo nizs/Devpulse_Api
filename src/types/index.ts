@@ -47,12 +47,10 @@ export type TokenPayload = {
 };
 
 
-export type IssueType = "bug" | "feature_request";
-export type IssueStatus = "open" | "in_progress" | "resolved";
+
 
 export type TIssue = {
     id: number;
-    user_id: number;
     title: string;
     description: string;
     type: IssueType;
@@ -62,3 +60,19 @@ export type TIssue = {
     updated_at: Date;
 }
 
+export type RIssue = Omit<TIssue, "id" | "status" | "reporter_id" | "created_at" | "updated_at">;
+
+
+export type IssueType = "bug" | "feature_request";
+export type IssueStatus = "open" | "in_progress" | "resolved";
+
+
+import type { JwtPayload } from "jsonwebtoken";
+
+declare global {
+    namespace Express {
+        interface Request {
+            user: JwtPayload
+        }
+    }
+}

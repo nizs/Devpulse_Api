@@ -3,7 +3,7 @@ import type { RUser, SafeUser, TUser } from "../../types";
 import bcrypt from "bcrypt";
 
 class AuthService {
-    async createUser(user: RUser & { password: string }) {
+    async createUser(user: RUser & { password: string }): Promise<SafeUser> {
         const { name, email, role, password } = user;
 
         const hash = await bcrypt.hash(password, 10);
@@ -16,9 +16,9 @@ class AuthService {
                 COALESCE(${role},'contributor'),
                 ${hash}
                 )
-                RETURNING id,name, email, role
+                RETURNING id,name, email, role,created_at, updated_at
             `
-        return res[0];
+        return res[0] as SafeUser;
     }
 
     async validateUser(email: string, password: string): Promise<SafeUser | null> {
