@@ -81,6 +81,44 @@ class IssueService {
         });
 
     }
+
+    async getSingleIssue(
+        id: number
+    ): Promise<IssueResponse> {
+        const issue = await sql`
+            SELECT id, title, description, type, status, reporter_id, created_at, updated_at
+            FROM issues WHERE id=${id}
+        `as TIssue[];
+
+        if (!issue.length) {
+            throw new Error("Issue not found");
+        }
+
+        const currentIssue = issue[0];
+        if (!currentIssue) {
+            throw new Error("Issue not found");
+        }
+        const reporter = await sql`
+            SELECT id, name, role From users WHERE id=${currentIssue.reporter_id}
+        `as Reporter[];
+
+        if (!reporter.length) {
+            throw new Error(`Reporter not found`);
+        }
+
+        return {
+            id: currentIssue.id,
+            title: currentIssue.title,
+            description: currentIssue.description,
+            type: currentIssue.type,
+            status: currentIssue.status,
+
+            reporter: reporter[0]!,
+
+            created_at: currentIssue.created_at,
+            updated_at: currentIssue.updated_at,
+        }
+    }
 }
 
 export default new IssueService();

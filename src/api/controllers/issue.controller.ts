@@ -20,8 +20,7 @@ export const createIssue = async (req: Request, res: Response) => {
     )
 }
 
-export const getAllIssues = async (req: Request, res: Response
-) => {
+export const getAllIssues = async (req: Request, res: Response) => {
 
     const { sort, type, status } = req.query;
 
@@ -41,3 +40,18 @@ export const getAllIssues = async (req: Request, res: Response
         HTTP_STATUS.OK
     );
 };
+
+export const getSingleIssue = async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+
+    const issue = await issueService.getSingleIssue(id);
+
+    return sendResponse(
+        res,
+        {
+            success: true,
+            message: "Issue retrieved successfully", data: issue
+        },
+        HTTP_STATUS.OK
+    )
+}
