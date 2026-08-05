@@ -1,5 +1,5 @@
 import { sql } from "../../db";
-import type { GetIssueQuery, IssueResponse, Reporter, RIssue, TIssue } from "../../types";
+import type { GetIssueQuery, IssueResponse, Reporter, RIssue, TIssue, TokenPayload } from "../../types";
 
 class IssueService {
     async createIssue(
@@ -118,6 +118,52 @@ class IssueService {
             created_at: currentIssue.created_at,
             updated_at: currentIssue.updated_at,
         }
+    }
+
+    async updateIssue(
+        id: number,
+        payload: RIssue,
+        user: TokenPayload
+    ): Promise<TIssue> {
+        const issues = await sql`
+            SELECT * FROM issues WHERE id=${id}
+        `as TIssue[];
+
+
+        const currentIssue = issues[0];
+        if (!currentIssue) {
+            throw new Error("Issue not found");
+        }
+
+
+        if (user.role !== "maintainer") {
+            if (currentIssue.reporter_id !== user.id) {
+                throw new Error("You are not authorized to update this issue");
+            }
+            if (currentIssue.status !== "open") {
+                throw new Error("Only open issues can be updated");
+            }
+        }
+
+        const { title, description, type } = payload;
+        const result = await sql`
+            UPDATE issues SET 
+            title=COALESCE(${title},title),
+            description=COALESCE(${description},description),
+            type=COALESCE(${type},type),
+            updated_at=NOW()
+
+            WHERE id=${id}
+
+            RETURNING id, title, description, type, status, reporter_id, created_at, updated_at;
+        ` as TIssue[];
+
+
+        const updatedIssue = result[0];
+        if (!updatedIssue) {
+            throw new Error("Failed to update issue");
+        }
+        return updatedIssue;
     }
 }
 

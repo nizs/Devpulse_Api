@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import issueService from "../services/issue.service";
 import { sendResponse } from "../../utils/sendResponse";
 import { HTTP_STATUS } from "../../utils/httpStatus";
+import type { TokenPayload } from "../../types";
 
 
 export const createIssue = async (req: Request, res: Response) => {
@@ -54,4 +55,24 @@ export const getSingleIssue = async (req: Request, res: Response) => {
         },
         HTTP_STATUS.OK
     )
+}
+
+export const updateIssue = async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+
+    const issue = await issueService.updateIssue(
+        id,
+        req.body,
+        req.user as TokenPayload
+    );
+
+    return sendResponse(
+        res,
+        {
+            success: true,
+            message: "Issue updated successfully",
+            data: issue
+        },
+        HTTP_STATUS.OK
+    );
 }
