@@ -76,3 +76,22 @@ export const updateIssue = async (req: Request, res: Response) => {
         HTTP_STATUS.OK
     );
 }
+
+export const deleteIssue = async (
+    req: Request,
+    res: Response
+) => {
+
+    const id = Number(req.params.id);
+
+    await issueService.deleteIssue(id);
+
+    return sendResponse(
+        res,
+        {
+            success: true,
+            message: "Issue deleted successfully",
+        },
+        HTTP_STATUS.OK
+    );
+};

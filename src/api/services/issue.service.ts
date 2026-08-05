@@ -165,6 +165,19 @@ class IssueService {
         }
         return updatedIssue;
     }
+
+    async deleteIssue(id: number): Promise<void> {
+
+        const result = await sql`
+        DELETE FROM issues
+        WHERE id = ${id}
+        RETURNING id
+    ` as { id: number }[];
+
+        if (!result.length) {
+            throw new Error("Issue not found");
+        }
+    }
 }
 
 export default new IssueService();
